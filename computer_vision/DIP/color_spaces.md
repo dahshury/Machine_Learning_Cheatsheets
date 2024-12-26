@@ -1,0 +1,8 @@
+| **Color Space**       | **Description**                                                                      | **Use Case**                               | **Applications**                                          |
+|-----------------------|--------------------------------------------------------------------------------------|--------------------------------------------|-----------------------------------------------------------|
+| **RGB**               | Standard Red-Green-Blue color model.                                                  | General image processing                   | Basic image manipulation, graphics, and display            |
+| **HSV**               | Hue-Saturation-Value, separates color from intensity.                                 | Color-based segmentation, object detection | Object tracking, color detection                           |
+| **Lab**               | Perceptually uniform color space (lightness and color channels).                      | Color comparison, color balancing          | Image enhancement, printing                                |
+| **YCbCr**             | Luminance (Y) and chrominance (Cb, Cr) components.                                    | Compression, broadcasting                  | Image compression (JPEG), video compression                |
+| **Grayscale**         | Removes color information, leaves intensity values.                                   | Preprocessing for edge detection or feature extraction | Image preprocessing, filtering                             |
+| **CMYK**              | Cyan, Magenta, Yellow, Key (black) used in printing.                                  | Printing, publishing                       | Color printing, image reproduction                         |
