@@ -12,6 +12,8 @@
 | `cv2.imshow(win_name, img)` <br> Displays an image **img** in a GUI window named **win_name**. | Visualizes an image in a pop-up window. | *No formula; simply displays the input image.* | - Useful for debugging and visualization.<br>- Quick to use. | - Requires a GUI environment.<br>- Blocks until a key press. |
 | `cv2.waitKey(delay=0)` <br> Waits for a key press for up to **delay** milliseconds (0 waits indefinitely). | Enables capturing key input, often used with `cv2.imshow`. | *No numeric formula; pauses execution.* | - Necessary for image display in OpenCV.<br>- Can capture keyboard events. | - Blocks execution until delay expires or key is pressed. |
 | `cv2.destroyAllWindows()` <br> Closes all OpenCV windows opened by `cv2.imshow`. | Releases GUI resources and ensures proper cleanup. | *No formula; simply closes GUI windows.* | - Prevents resource leakage.<br>- Easy to use. | - No effect if no windows are open.<br>- GUI-dependent. |
+| `cv2.createTrackbar(trackbar_name, window_name, value, count, on_change)` <br> Creates a trackbar slider for real-time parameter adjustments. | Dynamically adjusts values (e.g., thresholds) during runtime. | Triggers the `on_change` callback when value changes. | - Interactive parameter tuning.<br>- Simplifies testing and debugging. | - Requires additional code for callbacks.<br>- Limited GUI layout customization. |
+| `cv2.getTrackbarPos(trackbar_name, window_name)` <br> Retrieves the current value of a trackbar. | Accesses the current position (value) of a trackbar for dynamic use in code. | Returns the current slider value \(v\). | - Simple method to retrieve values.<br>- Works seamlessly with `cv2.createTrackbar`. | - Requires careful syncing between trackbar position and logic.<br>- Dependent on active GUI. |
 | `img[y1:y2, x1:x2]` (Cropping) <br> Crops a region of interest (ROI) from an image by slicing rows from **y1:y2** and columns from **x1:x2**. | Extracts a subregion of the image for focused processing. | $\text{Cropped}(x, y) = I(x + x_1, y + y_1)$ <br> *for* $(0 \leq x < x_2 - x_1, 0 \leq y < y_2 - y_1)$ | - Intuitive slicing with NumPy.<br>- Zero extra memory if used as reference. | - Must ensure indices are within bounds.<br>- Does not resize automatically. |
 | `cv2.split(img)` <br> Splits an image into its individual channels. | Decomposes a multi-channel image into separate single-channel arrays. | $\{I_B, I_G, I_R\} = \text{split}(I)$ <br> *where:* <br> $(I_B, I_G, I_R)$: Blue, Green, Red channels | - Simplifies channel-wise operations.<br>- Useful for color processing. | - Memory-intensive for large images.<br>- Requires recombining for visualization. |
 | `cv2.merge(channels)` <br> Combines separate single-channel arrays into a multi-channel image. | Merges individual channels into a single image. | $I = \text{merge}(\{I_B, I_G, I_R\})$ <br> *where:* <br> $(I_B, I_G, I_R)$: Blue, Green, Red channels | - Combines processed channels easily.<br>- Supports flexible channel manipulation. | - Requires correct ordering of channels.<br>- Limited to compatible dimensions. |
@@ -123,6 +125,30 @@
 | `cv2.moments(contour, binaryImage=False)` <br> Calculates spatial and central moments of a **contour** or **binaryImage**. | Computes moments for shape analysis and feature extraction. | Spatial moments: $m_{pq} = \sum_x \sum_y x^p y^q I(x, y)$ <br> Central moments: $\mu_{pq} = \sum_x \sum_y (x - \bar{x})^p (y - \bar{y})^q I(x, y)$ <br> *where:* <br> $(\bar{x} = \frac{m_{10}}{m_{00}}, \bar{y} = \frac{m_{01}}{m_{00}})$ | - Essential for centroid, orientation, and shape descriptors.<br>- Useful for shape matching. | - Requires accurate contour or binary image.<br>- Sensitive to noise in input data. |
 | `cv2.approxPolyDP(curve, epsilon, closed)` <br> Approximates a polygonal curve for **curve** with tolerance **epsilon**. The **closed** parameter specifies if the curve is closed. | Reduces the number of points in a contour while maintaining its shape. | Finds approximate vertices such that: <br> $\|d(i)\| \leq \epsilon$ <br> *where:* <br> $(d(i))$: Perpendicular distance from contour point $(i)$ to the polygon. | - Reduces complexity for contour processing.<br>- Useful for shape simplification. | - May lose small details.<br>- Sensitive to epsilon value. |
 | `cv2.pointPolygonTest(contour, point, measureDist)` <br> Tests the relationship of a **point** with respect to a **contour**. Returns 1 if inside, -1 if outside, and 0 if on the contour. If **measureDist** is `True`, it also returns the signed distance from the point to the contour. | Determines whether a point is inside, outside, or on a contour. | Computes the shortest Euclidean distance: <br> $d(p, C) = \min \|p - c\|$ <br> *where:* <br> $(p)$: Query point <br> $(C)$: Contour <br> $(\| \cdot \|)$: Euclidean norm | - Useful for hit-testing and distance measurements.<br>- Works with any contour. | - Requires well-defined contours.<br>- Sensitive to contour resolution. |
+
+Here are the two separate tables:
+
+---
+
+### Table: Contour Retrieval Modes
+
+| **Mode**                  | **Argument in `cv2.findContours()`** | **Description** |
+|---------------------------|--------------------------------------|------------------|
+| External Contours         | `cv2.RETR_EXTERNAL`                 | Retrieves only the outermost contours. All child contours are ignored. |
+| List of All Contours      | `cv2.RETR_LIST`                     | Retrieves all contours without establishing any hierarchical relationships. |
+| Two-Level Hierarchy       | `cv2.RETR_CCOMP`                    | Retrieves all contours and organizes them into a two-level hierarchy: external contours and their child contours. |
+| Full Hierarchy of Contours| `cv2.RETR_TREE`                     | Retrieves all contours and organizes them into a full hierarchy of nested contours. |
+
+---
+
+### Table: Contour Approximation Methods
+
+| **Method**                | **Argument in `cv2.findContours()`** | **Description** |
+|---------------------------|--------------------------------------|------------------|
+| No Compression            | `cv2.CHAIN_APPROX_NONE`             | Stores all the contour points without any compression. Results in the highest memory usage. |
+| Simple Compression         | `cv2.CHAIN_APPROX_SIMPLE`           | Compresses horizontal, vertical, and diagonal segments and only stores their end points. Reduces memory usage significantly. |
+| Teh-Chin (L1 Distance)     | `cv2.CHAIN_APPROX_TC89_L1`          | Applies the Teh-Chin chain approximation algorithm (L1 distance metric) for contour representation. |
+| Teh-Chin (K-Cosine Metric) | `cv2.CHAIN_APPROX_TC89_KCOS`        | Uses the Teh-Chin chain approximation algorithm (k-cosine metric) for contour representation. |
 
 ---
 
@@ -310,3 +336,15 @@
 
 ---
 
+Here’s a new table for **Pixel Count and Mask Analysis**, including `cv2.countNonZero` and similar functions:
+
+---
+
+## Table 22: Pixel Count and Mask Analysis
+
+| **Function & Arguments** | **Description** | **Formula & Details** | **Advantages** | **Disadvantages** |
+|---------------------------|-----------------|------------------------|----------------|--------------------|
+| `cv2.countNonZero(src)` <br> Counts the number of non-zero pixels in the input image **src**. | Calculates the number of non-zero pixels in a binary or grayscale image. | $N_{\text{non-zero}} = \sum_{x, y} \delta(I(x, y))$ <br> *where:* <br> $\delta(I(x, y)) = \begin{cases} 1 & \text{if } I(x, y) \neq 0 \\ 0 & \text{otherwise} \end{cases}$ | - Fast and efficient.<br>- Useful for analyzing masks or binary images. | - Limited to counting.<br>- Does not provide pixel locations. |
+| `np.sum(src > 0)` (NumPy) <br> Counts the number of pixels greater than 0 in **src** using NumPy. | Alternative to `cv2.countNonZero` for more flexibility. | Similar to $N_{\text{non-zero}}$ using NumPy’s array logic. | - Highly flexible.<br>- Works with multi-dimensional arrays. | - Slower for large images compared to OpenCV. |
+| `cv2.findNonZero(src)` <br> Finds the coordinates of all non-zero pixels in **src**. | Returns a list of the coordinates of non-zero pixels. | $P = \{(x, y) \mid I(x, y) \neq 0\}$ | - Provides exact pixel locations.<br>- Useful for region analysis. | - Memory-intensive for dense masks.<br>- Slower for large-scale data. |
+| `cv2.compare(src1, src2, cmpop)` <br> Performs pixel-wise comparison between **src1** and **src2** using an operator **cmpop** (e.g., `cv2.CMP_GT`, `cv2.CMP_EQ`). | Generates a binary mask based on the comparison. | Compares pixel values: $R(x, y) = \begin{cases} 255 & \text{if comparison is true} \\ 0 & \text{otherwise} \end{cases}$ | - Flexible with multiple comparison operators.<br>- Useful for mask creation. | - Limited to pixel-wise comparisons.<br>- Requires same dimensions for inputs. |
